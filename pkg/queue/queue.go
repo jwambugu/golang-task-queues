@@ -2,7 +2,6 @@ package queue
 
 import (
 	"context"
-	"github.com/hibiken/asynq"
 )
 
 // Queue represents the queue which a Job runs on.
@@ -30,7 +29,7 @@ var queues = map[string]int{
 // Handler processes the given Task
 type Worker interface {
 	Name() string
-	Handler(ctx context.Context, task *asynq.Task) error
+	Handler(ctx context.Context, payload Payload) error
 }
 
 // Queuer provides methods for managing the queue

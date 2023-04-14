@@ -4,17 +4,24 @@ import "time"
 
 type TaskType string
 
+func (t TaskType) String() string {
+	return string(t)
+}
+
 // Task queues a job to be executed.
 //
-// LastError stores the last error encountered whn running the BaseTask
-// OnQueue indicates the Queue the BaseTask should be executed on.
-// RunIn indicates when to run the BaseTask.
-// TaskType is an identifier for the BaseTask.
+// # LastError stores the last error encountered whn running the Task
+//
+// OnQueue indicates the Queue the Task should be executed on.
+//
+// RunIn indicates when to run the Task.
+//
+// Type is an identifier for the Task.
 type Task interface {
 	LastError() error
 	OnQueue() Queue
-	RunIn() time.Duration
-	TaskType() TaskType
+	RunIn() []time.Duration
+	Type() TaskType
 }
 
 type BaseTask struct {

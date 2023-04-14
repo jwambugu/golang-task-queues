@@ -2,39 +2,56 @@ package queue
 
 import "time"
 
-// Task represents a Job to be executed
-type Task string
+type TaskType string
 
-func (t Task) String() string {
-	return string(t)
-}
-
-// TaskRunner queues a Task.
+// Task queues a job to be executed.
 //
-// ProcessIn indicates when to run the Task.
-// Queue indicates the level the Task should be executed on.
-// Task indicates the
-type TaskRunner interface {
-	ProcessIn() time.Duration
-	Priority() Queue
-	Task() Task
+// LastError stores the last error encountered whn running the BaseTask
+// OnQueue indicates the Queue the BaseTask should be executed on.
+// RunIn indicates when to run the BaseTask.
+// TaskType is an identifier for the BaseTask.
+type Task interface {
+	LastError() error
+	OnQueue() Queue
+	RunIn() time.Duration
+	TaskType() TaskType
 }
 
-// Job represents a Task that will be executed
-type Job struct {
-	Payload      Task          `json:"payload,omitempty"`
-	RunAfter     time.Duration `json:"run_after,omitempty"`
-	WithPriority Queue         `json:"with_priority,omitempty"`
+type BaseTask struct {
+	LastErr   error           `json:"last_error,omitempty"`
+	ProcessIn []time.Duration `json:"process_in,omitempty"`
+	Queue     Queue           `json:"queue,omitempty"`
+	TaskType  TaskType        `json:"task_type,omitempty"`
 }
 
-func (j *Job) ProcessIn() time.Duration {
-	return j.RunAfter
+func (b *BaseTask) LastError() error {
+	return b.LastErr
 }
 
-func (j *Job) Priority() Queue {
-	return j.WithPriority
+func (b *BaseTask) OnQueue() Queue {
+	return b.Queue
 }
 
-func (j *Job) Task() Task {
-	return j.Payload
+func (b *BaseTask) RunIn() []time.Duration {
+	return b.ProcessIn
+}
+
+func (b *BaseTask) Type() TaskType {
+	return b.TaskType
+}
+
+// NewTask creates a new Task running on the Default Queue
+func NewTask(t TaskType) BaseTask {
+	return BaseTask{
+		Queue:    Default,
+		TaskType: t,
+	}
+}
+
+// NewTaskOnQueue creates a Task to be run on the provided Queue
+func NewTaskOnQueue(q Queue, t TaskType) BaseTask {
+	return BaseTask{
+		Queue:    q,
+		TaskType: t,
+	}
 }

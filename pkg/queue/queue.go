@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// Queue represents the queue which a Job runs on.
+// Queue represents the queue which a Task runs on.
 type Queue string
 
 const (
@@ -25,11 +25,11 @@ var queues = map[string]int{
 
 // Worker processes a Task based on its configuration.
 //
-// Name is a unique identifier for the Task being executed
+// Key is a unique identifier for the Task being executed
 // Handler processes the given Task
 type Worker interface {
-	Name() string
-	Handler(ctx context.Context, payload Payload) error
+	Key() string
+	Handler(ctx context.Context, payload Task) error
 }
 
 // Queuer provides methods for managing the queue
@@ -38,5 +38,5 @@ type Worker interface {
 // Enqueue adds the Task to the Queue
 type Queuer interface {
 	Close() error
-	Enqueue(ctx context.Context)
+	Enqueue(ctx context.Context, task Task)
 }
